@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pesquisa NPS – CMEE Acirp</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul-acirp: #1a3a6b;
+    --azul-cmee: #003087;
+    --azul-claro: #2563b0;
+    --dourado: #c8960c;
+    --cinza-bg: #f4f6fa;
+    --cinza-borda: #d0d7e8;
+    --branco: #ffffff;
+    --texto: #1a1a2e;
+    --texto-muted: #5a6a8a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: var(--cinza-bg); color: var(--texto); min-height: 100vh; padding: 2rem 1rem 4rem; }
+  .form-card { max-width: 680px; margin: 0 auto; background: var(--branco); border-radius: 16px; border: 1.5px solid var(--cinza-borda); overflow: hidden; }
+  .form-header { background: var(--azul-cmee); padding: 2rem 2rem 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+  .logo-circle { width: 52px; height: 52px; border-radius: 50%; background: var(--branco); display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 10px; color: var(--azul-cmee); text-align: center; line-height: 1.2; padding: 6px; border: 2px solid rgba(255,255,255,0.4); }
+  .header-text { color: white; }
+  .header-text .acirp { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px; }
+  .header-text .sub { font-size: 12px; opacity: 0.8; letter-spacing: 0.5px; }
+  .cmee-badge { background: var(--dourado); color: white; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; padding: 5px 20px; border-radius: 4px; }
+  .form-title-bar { background: var(--azul-acirp); padding: 1rem 2rem; text-align: center; }
+  .form-title-bar h1 { font-family: 'Montserrat', sans-serif; font-weight: 600; color: white; font-size: 16px; letter-spacing: 0.5px; }
+  .reuniao-info { color: rgba(255,255,255,0.75); font-size: 13px; margin-top: 4px; }
+  .form-body { padding: 2rem; }
+  .form-section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--cinza-borda); }
+  .form-section:last-of-type { border-bottom: none; margin-bottom: 0.5rem; }
+  .section-num { display: inline-block; background: var(--azul-cmee); color: white; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 11px; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; margin-right: 8px; }
+  .section-label { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 14px; color: var(--azul-acirp); margin-bottom: 1rem; display: flex; align-items: flex-start; }
+  .nps-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .nps-btn { width: 46px; height: 46px; border-radius: 8px; border: 1.5px solid var(--cinza-borda); background: var(--branco); font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 16px; color: var(--texto); cursor: pointer; transition: all 0.15s; }
+  .nps-btn:hover { border-color: var(--azul-claro); color: var(--azul-claro); background: #eef3fc; }
+  .nps-btn.sel-red { background: #e74c3c; border-color: #e74c3c; color: white; }
+  .nps-btn.sel-yellow { background: #f39c12; border-color: #f39c12; color: white; }
+  .nps-btn.sel-green { background: #27ae60; border-color: #27ae60; color: white; }
+  .nps-legend { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--texto-muted); }
+  .options-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .opt-btn { padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--cinza-borda); background: var(--branco); font-family: 'Open Sans', sans-serif; font-size: 13px; color: var(--texto); cursor: pointer; transition: all 0.15s; }
+  .opt-btn:hover { border-color: var(--azul-claro); background: #eef3fc; }
+  .opt-btn.selected { background: var(--azul-cmee); border-color: var(--azul-cmee); color: white; }
+  .outro-input { width: 100%; margin-top: 10px; padding: 10px 14px; border-radius: 8px; border: 1.5px solid var(--cinza-borda); font-family: 'Open Sans', sans-serif; font-size: 13px; color: var(--texto); outline: none; display: none; }
+  .outro-input:focus { border-color: var(--azul-claro); }
+  .textarea-field { width: 100%; min-height: 110px; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--cinza-borda); font-family: 'Open Sans', sans-serif; font-size: 13px; color: var(--texto); resize: vertical; outline: none; background: var(--branco); }
+  .textarea-field:focus { border-color: var(--azul-claro); }
+  .textarea-field::placeholder { color: var(--texto-muted); }
+  .submit-btn { width: 100%; padding: 14px; background: var(--azul-cmee); color: white; border: none; border-radius: 10px; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; cursor: pointer; margin-top: 1.5rem; transition: background 0.2s; }
+  .submit-btn:hover { background: var(--azul-claro); }
+  .submit-btn:disabled { background: #aaa; cursor: not-allowed; }
+  .success-msg { display: none; text-align: center; padding: 3rem 2rem; }
+  .success-msg .check { font-size: 48px; margin-bottom: 1rem; }
+  .success-msg h2 { font-family: 'Montserrat', sans-serif; font-weight: 700; color: var(--azul-cmee); font-size: 20px; margin-bottom: 0.5rem; }
+  .success-msg p { color: var(--texto-muted); font-size: 14px; }
+  .error-msg { display: none; color: #e74c3c; font-size: 12px; margin-top: 6px; }
+  @media (max-width: 480px) {
+    .nps-btn { width: 38px; height: 38px; font-size: 14px; }
+    .form-body { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="form-card">
+  <div class="form-header">
+    <div class="logo-area">
+      <div class="logo-circle">ACIRP<br>SJdRP</div>
+      <div class="header-text">
+        <div class="acirp">Acirp</div>
+        <div class="sub">São José do Rio Preto</div>
+      </div>
+    </div>
+    <div class="cmee-badge">CMEE</div>
+  </div>
+
+  <div class="form-title-bar">
+    <h1>Pesquisa de NPS</h1>
+    <div class="reuniao-info" id="reuniao-display">Reunião CMEE</div>
+  </div>
+
+  <div class="form-body" id="form-body">
+
+    <div class="form-section">
+      <div class="section-label"><span class="section-num">1</span>De 0 a 10, o quanto você recomendaria as reuniões do CMEE para outra empresária/empreendedora?</div>
+      <div class="nps-row" id="nps-buttons"></div>
+      <div class="nps-legend">
+        <span>😕 Não recomendaria</span>
+        <span>😊 Recomendaria muito</span>
+      </div>
+      <div class="error-msg" id="err-nps">Por favor, selecione uma nota.</div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label"><span class="section-num">2</span>O que mais agregou para você nesta reunião?</div>
+      <div class="options-grid" id="agrega-opts">
+        <button class="opt-btn" data-val="Conteúdo">Conteúdo</button>
+        <button class="opt-btn" data-val="Networking">Networking</button>
+        <button class="opt-btn" data-val="Dinâmica">Dinâmica</button>
+        <button class="opt-btn" data-val="Organização">Organização</button>
+        <button class="opt-btn" data-val="Troca de experiências">Troca de experiências</button>
+        <button class="opt-btn outro-trigger" data-val="Outro">Outro</button>
+      </div>
+      <input type="text" class="outro-input" id="outro-agrega" placeholder="Descreva o que mais agregou..." />
+      <div class="error-msg" id="err-agrega">Por favor, selecione uma opção.</div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label"><span class="section-num">3</span>Como você avalia a duração da reunião?</div>
+      <div class="options-grid" id="duracao-opts">
+        <button class="opt-btn" data-val="Muito longa">Muito longa</button>
+        <button class="opt-btn" data-val="Adequada">Adequada</button>
+        <button class="opt-btn" data-val="Muito curta">Muito curta</button>
+      </div>
+      <div class="error-msg" id="err-duracao">Por favor, selecione uma opção.</div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label"><span class="section-num">4</span>Você saiu da reunião com alguma ação prática ou insight aplicável?</div>
+      <div class="options-grid" id="insight-opts">
+        <button class="opt-btn" data-val="Sim">Sim</button>
+        <button class="opt-btn" data-val="Não">Não</button>
+        <button class="opt-btn" data-val="Parcialmente">Parcialmente</button>
+      </div>
+      <div class="error-msg" id="err-insight">Por favor, selecione uma opção.</div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label"><span class="section-num">5</span>Gostaria de compartilhar alguma sugestão, crítica, ideia ou percepção sobre esta reunião?</div>
+      <textarea class="textarea-field" id="comentario" placeholder="Escreva à vontade. Sua opinião é muito importante para o CMEE!"></textarea>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitForm()">Enviar minha avaliação</button>
+  </div>
+
+  <div class="success-msg" id="success-msg">
+    <div class="check">💙</div>
+    <h2>Obrigada pela sua participação!</h2>
+    <p>Sua avaliação foi registrada com sucesso.<br>Juntas, fazemos o CMEE cada vez melhor.</p>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURAÇÃO — substitua pela URL do seu Google Apps Script
+// ============================================================
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxARmm7YDyCI8J-DvKBT9olQfx3wXYhwNy7bdD44GBYKpz1U1_XKFIfBXyesm-5K38AeA/exec';
+// ============================================================
+
+let npsVal = null, agregaVal = null, duracaoVal = null, insightVal = null;
+
+function getParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const p = d.split('-');
+  return p.length === 3 ? p[2]+'/'+p[1]+'/'+p[0] : d;
+}
+
+const urlDate = getParam('data');
+const urlTema = getParam('tema');
+
+if (urlDate || urlTema) {
+  let txt = 'Reunião CMEE';
+  if (urlDate) txt += ' — ' + formatDate(urlDate);
+  if (urlTema) txt += ' | ' + decodeURIComponent(urlTema);
+  document.getElementById('reuniao-display').textContent = txt;
+}
+
+// Botões NPS
+const npsRow = document.getElementById('nps-buttons');
+for (let i = 0; i <= 10; i++) {
+  const btn = document.createElement('button');
+  btn.className = 'nps-btn';
+  btn.textContent = i;
+  btn.onclick = () => {
+    document.querySelectorAll('.nps-btn').forEach(b => b.className = 'nps-btn');
+    npsVal = i;
+    btn.classList.add(i <= 6 ? 'sel-red' : i <= 8 ? 'sel-yellow' : 'sel-green');
+    document.getElementById('err-nps').style.display = 'none';
+  };
+  npsRow.appendChild(btn);
+}
+
+function setupSingle(id, setter, errId) {
+  document.getElementById(id).querySelectorAll('.opt-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.getElementById(id).querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      setter(btn.dataset.val);
+      document.getElementById(errId).style.display = 'none';
+      if (id === 'agrega-opts') {
+        document.getElementById('outro-agrega').style.display =
+          btn.classList.contains('outro-trigger') ? 'block' : 'none';
+      }
+    };
+  });
+}
+
+setupSingle('agrega-opts',  v => agregaVal  = v, 'err-agrega');
+setupSingle('duracao-opts', v => duracaoVal = v, 'err-duracao');
+setupSingle('insight-opts', v => insightVal = v, 'err-insight');
+
+function submitForm() {
+  let valid = true;
+  if (npsVal === null) { document.getElementById('err-nps').style.display='block'; valid=false; }
+  if (!agregaVal)      { document.getElementById('err-agrega').style.display='block'; valid=false; }
+  if (!duracaoVal)     { document.getElementById('err-duracao').style.display='block'; valid=false; }
+  if (!insightVal)     { document.getElementById('err-insight').style.display='block'; valid=false; }
+  if (!valid) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const outroTxt = document.getElementById('outro-agrega').value;
+  const payload = {
+    data:       urlDate || new Date().toISOString().split('T')[0],
+    tema:       urlTema ? decodeURIComponent(urlTema) : '',
+    nps:        npsVal,
+    agrega:     agregaVal === 'Outro' ? 'Outro: ' + outroTxt : agregaVal,
+    duracao:    duracaoVal,
+    insight:    insightVal,
+    comentario: document.getElementById('comentario').value,
+    timestamp:  new Date().toISOString()
+  };
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).finally(() => {
+    document.getElementById('form-body').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  });
+}
+</script>
+</body>
+</html>
