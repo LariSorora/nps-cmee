@@ -449,38 +449,50 @@ async function classificarComIA() {
   document.getElementById('loading-ia').style.display = 'block';
   document.getElementById('comentarios-lista').innerHTML = '';
 
+  // Usa JSONP para chamar o Apps Script
+  const cbName = 'jsonpCb_' + Date.now();
+  const timeout = setTimeout(() => {
+    delete window[cbName];
+    document.getElementById('loading-ia').style.display = 'none';
+    document.getElementById('comentarios-lista').innerHTML = '<div class="empty-state" style="color:var(--vermelho)">Tempo esgotado. Tente novamente.</div>';
+    document.getElementById('btn-ia').disabled = false;
+  }, 60000);
+
+  // Primeiro envia os comentários via POST para o Apps Script classificar
+  // Depois busca o resultado via JSONP
   try {
-    // Usa JSONP para contornar CORS
+    // Passo 1: envia para classificar via fetch (no-cors, só dispara)
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'classificar_store', comentarios, cbKey: cbName })
+    });
+
+    // Passo 2: busca resultado via JSONP após 3s
+    await new Promise(r => setTimeout(r, 3000));
+
     const classificados = await new Promise((resolve, reject) => {
-      const cbName = 'cb_' + Date.now();
       const script = document.createElement('script');
       window[cbName] = (data) => {
+        clearTimeout(timeout);
         delete window[cbName];
         document.body.removeChild(script);
         resolve(data);
       };
-      script.onerror = () => reject(new Error('Erro no script'));
-      script.src = SCRIPT_URL
-        + '?action=classificar'
-        + '&comentarios=' + encodeURIComponent(JSON.stringify(comentarios))
-        + '&callback=' + cbName;
+      script.onerror = () => { clearTimeout(timeout); reject(new Error('Erro')); };
+      script.src = SCRIPT_URL + '?action=get_result&cbKey=' + cbName + '&callback=' + cbName;
       document.body.appendChild(script);
-      setTimeout(() => reject(new Error('Timeout')), 30000);
     });
 
     const origens = dadosFiltrados.filter(d => d.comentario && String(d.comentario).trim().length > 3);
     comentariosClass = comentarios.map((c, i) => {
       const cl = Array.isArray(classificados) ? classificados.find(x => x.indice === i) : null;
-      return {
-        texto: c,
-        tema: cl ? cl.tema : 'Outro',
-        resumo: cl ? cl.resumo : '',
-        nps: origens[i]?.nps,
-        data: origens[i]?.dataFmt
-      };
+      return { texto: c, tema: cl ? cl.tema : 'Outro', resumo: cl ? cl.resumo : '', nps: origens[i]?.nps, data: origens[i]?.dataFmt };
     });
     renderComentarios(comentariosClass, 'todos');
   } catch(err) {
+    clearTimeout(timeout);
     document.getElementById('loading-ia').style.display = 'none';
     document.getElementById('comentarios-lista').innerHTML = '<div class="empty-state" style="color:var(--vermelho)">Erro ao classificar. Tente novamente.</div>';
     document.getElementById('btn-ia').disabled = false;
