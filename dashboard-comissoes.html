@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Comissões – CMEE 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --azul:#003C7E;--azul-med:#00509E;--azul-light:#D6E4F5;--azul-pale:#EDF4FB;
+  --roxo:#6B2D8B;--roxo-light:#EBD9F5;--roxo-pale:#F7F0FC;
+  --branco:#FFFFFF;--bg:#F5F6FA;--borda:rgba(0,60,126,0.12);
+  --text:#1A1F36;--text-med:#5A6282;--text-light:#9CA3BF;
+  --verde:#1A6B40;--vermelho:#C0392B;
+  --c1:#003C7E;--c2:#6B2D8B;--c3:#1A6B40;--c4:#C8960C;--c5:#C0392B
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* LOGIN */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:linear-gradient(160deg,var(--azul) 0%,var(--roxo) 100%)}
+.login-card{background:white;border-radius:16px;padding:2.5rem 2rem;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+.login-logo{width:60px;height:60px;border-radius:50%;background:var(--azul-pale);border:2px solid var(--azul-light);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-family:'Montserrat',sans-serif;font-weight:800;font-size:10px;color:var(--azul);line-height:1.2;padding:6px}
+.login-card h2{font-family:'Montserrat',sans-serif;font-weight:800;font-size:20px;color:var(--azul);margin-bottom:.3rem}
+.login-card p{font-size:13px;color:var(--text-med);margin-bottom:1.75rem}
+.login-card input{width:100%;padding:11px 14px;border:1.5px solid var(--borda);border-radius:8px;font-family:'Open Sans',sans-serif;font-size:14px;color:var(--text);outline:none;text-align:center;letter-spacing:2px;margin-bottom:.75rem;transition:.2s}
+.login-card input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,60,126,0.1)}
+.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--azul),var(--roxo));color:white;border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;transition:opacity .2s}
+.login-btn:hover{opacity:.9}
+.login-err{display:none;color:var(--vermelho);font-size:12px;margin-top:.5rem}
+
+/* DASHBOARD */
+#dashboard{display:none}
+.header{background:var(--azul);padding:0}
+.header-top{max-width:1140px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo-wrap{display:flex;align-items:center;gap:12px}
+.logo-circle-sm{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:8px;color:white;text-align:center;line-height:1.2;padding:4px}
+.logo-txt{color:white}
+.logo-txt b{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;display:block}
+.logo-txt small{font-size:11px;opacity:.7}
+.header-right{display:flex;align-items:center;gap:12px}
+.badge-dash{background:var(--roxo);color:white;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:.05em}
+.btn-refresh{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:8px;color:white;font-family:'Open Sans',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;cursor:pointer;transition:.18s}
+.btn-refresh:hover{background:rgba(255,255,255,0.25)}
+.h-faixa{background:var(--roxo);text-align:center;padding:5px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.9)}
+
+main{max-width:1140px;margin:0 auto;padding:2rem 1.5rem 5rem}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:1.75rem}
+.stat-card{background:var(--branco);border-radius:12px;border:1px solid var(--borda);padding:1.25rem 1.4rem;display:flex;align-items:center;gap:14px}
+.stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.stat-body{}
+.stat-num{font-family:'Montserrat',sans-serif;font-size:28px;font-weight:800;line-height:1;color:var(--azul)}
+.stat-label{font-size:12px;color:var(--text-med);margin-top:2px}
+
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;margin-bottom:1.75rem}
+.chart-card{background:var(--branco);border-radius:12px;border:1px solid var(--borda);padding:1.4rem;overflow:hidden}
+.chart-card.full{grid-column:1/-1}
+.chart-title{font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:var(--azul);margin-bottom:1.2rem;display:flex;align-items:center;gap:8px}
+.chart-title span{width:4px;height:16px;background:var(--roxo);border-radius:2px;display:inline-block}
+.chart-wrap{position:relative;height:220px}
+.chart-wrap.tall{height:260px}
+
+/* TABELA */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:var(--azul-pale);border-bottom:2px solid var(--azul-light)}
+thead th{padding:10px 12px;text-align:left;font-family:'Montserrat',sans-serif;font-weight:700;font-size:11px;color:var(--azul);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--borda);transition:background .15s}
+tbody tr:hover{background:var(--azul-pale)}
+tbody td{padding:10px 12px;color:var(--text);vertical-align:middle}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.tag-mkt{background:#EDF4FB;color:#003C7E}
+.tag-evt{background:#F7F0FC;color:#6B2D8B}
+.tag-con{background:#E8F8F1;color:#1A6B40}
+.tag-multi{background:#FDF3DC;color:#7A5A06}
+.btn-wpp{display:inline-flex;align-items:center;gap:4px;background:#E8F8F1;color:#1A6B40;border:1px solid #C3ECD9;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;text-decoration:none;transition:.15s}
+.btn-wpp:hover{background:#25D366;color:white;border-color:#25D366}
+
+/* Loading */
+.loading{text-align:center;padding:4rem 2rem;color:var(--text-med)}
+.loading-spin{width:32px;height:32px;border:3px solid var(--borda);border-top-color:var(--roxo);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Filtros tabela */
+.filtros-bar{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.filtro-tab{padding:5px 14px;border-radius:20px;border:1.5px solid var(--borda);background:transparent;font-family:'Open Sans',sans-serif;font-size:12px;font-weight:600;color:var(--text-med);cursor:pointer;transition:.15s}
+.filtro-tab:hover{border-color:var(--roxo);color:var(--roxo)}
+.filtro-tab.ativo{background:var(--roxo);color:white;border-color:var(--roxo)}
+
+/* Atualizado */
+.updated-info{font-size:12px;color:var(--text-light);text-align:right;margin-bottom:1rem}
+
+@media(max-width:640px){
+  main{padding:1.25rem 1rem 3rem}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .charts-grid{grid-template-columns:1fr}
+  .header-top{height:auto;padding:10px 1rem;flex-wrap:wrap;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">CMEE<br>ACIRP</div>
+    <h2>Dashboard Comissões</h2>
+    <p>Acesso restrito às lideranças do CMEE 2026</p>
+    <input type="password" id="senha-input" placeholder="••••••••••" onkeydown="if(event.key==='Enter')verificarSenha()">
+    <button class="login-btn" onclick="verificarSenha()">Acessar</button>
+    <div class="login-err" id="login-err">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-wrap">
+        <div class="logo-circle-sm">CMEE<br>ACIRP</div>
+        <div class="logo-txt">
+          <b>Dashboard · Comissões 2026</b>
+          <small>Conselho da Mulher Empresária e Empreendedora</small>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="badge-dash">Restrito</span>
+        <button class="btn-refresh" onclick="carregarDados()">↻ Atualizar</button>
+      </div>
+    </div>
+    <div class="h-faixa">Acirp · São José do Rio Preto</div>
+  </div>
+
+  <main>
+    <div id="loading" class="loading">
+      <div class="loading-spin"></div>
+      <p>Carregando dados da planilha...</p>
+    </div>
+
+    <div id="conteudo" style="display:none">
+      <div class="updated-info" id="updated-info"></div>
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#EDF4FB">👩‍💼</div>
+          <div class="stat-body"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total de inscritas</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#EDF4FB">📢</div>
+          <div class="stat-body"><div class="stat-num" id="s-mkt">0</div><div class="stat-label">Marketing e Comunicação</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#F7F0FC">🎯</div>
+          <div class="stat-body"><div class="stat-num" id="s-evt">0</div><div class="stat-label">Eventos</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#E8F8F1">🤝</div>
+          <div class="stat-body"><div class="stat-num" id="s-con">0</div><div class="stat-label">Conexão e Associativismo</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#FDF3DC">✨</div>
+          <div class="stat-body"><div class="stat-num" id="s-multi">0</div><div class="stat-label">Mais de uma comissão</div></div>
+        </div>
+      </div>
+
+      <!-- GRÁFICOS -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title"><span></span>Distribuição por comissão</div>
+          <div class="chart-wrap"><canvas id="chart-comissao"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"><span></span>Disponibilidade mensal</div>
+          <div class="chart-wrap"><canvas id="chart-tempo"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"><span></span>Perfil de atuação</div>
+          <div class="chart-wrap"><canvas id="chart-perfil"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title"><span></span>O que buscam</div>
+          <div class="chart-wrap"><canvas id="chart-busca"></canvas></div>
+        </div>
+      </div>
+
+      <!-- TABELA -->
+      <div class="chart-card full">
+        <div class="chart-title"><span></span>Lista de inscritas</div>
+        <div class="filtros-bar" id="filtros-tabela">
+          <button class="filtro-tab ativo" onclick="filtrarTabela('todas',this)">Todas</button>
+          <button class="filtro-tab" onclick="filtrarTabela('Marketing e Comunicação',this)">Marketing</button>
+          <button class="filtro-tab" onclick="filtrarTabela('Eventos',this)">Eventos</button>
+          <button class="filtro-tab" onclick="filtrarTabela('Conexão e Associativismo',this)">Conexão</button>
+          <button class="filtro-tab" onclick="filtrarTabela('Tenho interesse em mais de uma',this)">Mais de uma</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nome</th>
+                <th>Empresa</th>
+                <th>Comissão</th>
+                <th>Disponibilidade</th>
+                <th>Perfil</th>
+                <th>Busca</th>
+                <th>Contato</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+const SENHA = 'CMEE_2628_Sorora';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3658R0g4ESzqTF67mk0_QftzVE5faYi3Q-r1ZDBVCAxtU-o5eanJEU9FvW1fd6qAoKg/exec';
+
+let dadosGlobais = [];
+let filtroAtivo = 'todas';
+let charts = {};
+
+function verificarSenha() {
+  const input = document.getElementById('senha-input').value;
+  if (input === SENHA) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    carregarDados();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('senha-input').value = '';
+    document.getElementById('senha-input').focus();
+  }
+}
+
+function carregarDados() {
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('conteudo').style.display = 'none';
+
+  fetch(SCRIPT_URL + '?action=getDados')
+    .then(r => r.json())
+    .then(data => {
+      dadosGlobais = data;
+      renderizar(data);
+      document.getElementById('updated-info').textContent =
+        'Última atualização: ' + new Date().toLocaleString('pt-BR');
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+    })
+    .catch(() => {
+      document.getElementById('loading').innerHTML =
+        '<p style="color:#C0392B">Erro ao carregar dados. Verifique a URL do script e tente novamente.</p>';
+    });
+}
+
+function contarPor(dados, campo) {
+  const counts = {};
+  dados.forEach(d => {
+    const v = d[campo] || 'Não informado';
+    counts[v] = (counts[v] || 0) + 1;
+  });
+  return counts;
+}
+
+function renderizar(dados) {
+  // Stats
+  document.getElementById('s-total').textContent = dados.length;
+  document.getElementById('s-mkt').textContent   = dados.filter(d => d.comissao === 'Marketing e Comunicação').length;
+  document.getElementById('s-evt').textContent   = dados.filter(d => d.comissao === 'Eventos').length;
+  document.getElementById('s-con').textContent   = dados.filter(d => d.comissao === 'Conexão e Associativismo').length;
+  document.getElementById('s-multi').textContent = dados.filter(d => d.comissao === 'Tenho interesse em mais de uma').length;
+
+  // Cores
+  const cores = ['#003C7E','#6B2D8B','#1A6B40','#C8960C','#C0392B','#00509E','#8B3DAF'];
+
+  // Gráfico comissão
+  const gc = contarPor(dados, 'comissao');
+  criarGrafico('chart-comissao', 'doughnut', Object.keys(gc), Object.values(gc), cores);
+
+  // Gráfico tempo
+  const gt = contarPor(dados, 'tempo');
+  const ordemTempo = ['Até 1h','2h a 4h','5h a 8h','Mais de 8h'];
+  const valsTempo = ordemTempo.map(k => gt[k] || 0);
+  criarGrafico('chart-tempo', 'bar', ordemTempo, valsTempo, cores);
+
+  // Gráfico perfil
+  const gp = contarPor(dados, 'perfil');
+  criarGrafico('chart-perfil', 'bar', Object.keys(gp), Object.values(gp), cores, true);
+
+  // Gráfico busca
+  const gb = contarPor(dados, 'busca');
+  criarGrafico('chart-busca', 'bar', Object.keys(gb), Object.values(gb), cores, true);
+
+  // Tabela
+  renderizarTabela(dados, filtroAtivo);
+}
+
+function criarGrafico(id, tipo, labels, valores, cores, horizontal) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id).getContext('2d');
+  const bgCores = labels.map((_, i) => cores[i % cores.length]);
+
+  charts[id] = new Chart(ctx, {
+    type: tipo,
+    data: {
+      labels: labels,
+      datasets: [{
+        data: valores,
+        backgroundColor: bgCores,
+        borderWidth: tipo === 'doughnut' ? 2 : 0,
+        borderColor: '#fff',
+        borderRadius: tipo === 'bar' ? 6 : 0
+      }]
+    },
+    options: {
+      indexAxis: horizontal ? 'y' : 'x',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: tipo === 'doughnut',
+          position: 'bottom',
+          labels: { font: { family: 'Open Sans', size: 11 }, padding: 12, boxWidth: 12 }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.parsed + (tipo === 'doughnut' ? '' : ' inscritas') + (tipo === 'doughnut' ? ' inscritas' : '')
+          }
+        }
+      },
+      scales: tipo === 'bar' ? {
+        x: { grid: { display: false }, ticks: { font: { family: 'Open Sans', size: 11 } } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { family: 'Open Sans', size: 11 }, stepSize: 1 } }
+      } : {}
+    }
+  });
+}
+
+function tagComissao(c) {
+  if (c === 'Marketing e Comunicação') return '<span class="tag tag-mkt">📢 Marketing</span>';
+  if (c === 'Eventos') return '<span class="tag tag-evt">🎯 Eventos</span>';
+  if (c === 'Conexão e Associativismo') return '<span class="tag tag-con">🤝 Conexão</span>';
+  return '<span class="tag tag-multi">✨ Mais de uma</span>';
+}
+
+function renderizarTabela(dados, filtro) {
+  const lista = filtro === 'todas' ? dados : dados.filter(d => d.comissao === filtro);
+  const tbody = document.getElementById('tabela-body');
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-light)">Nenhuma inscrita nesta comissão ainda.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map((d, i) => `
+    <tr>
+      <td style="color:var(--text-light);font-size:12px">${i+1}</td>
+      <td style="font-weight:600">${d.nome}</td>
+      <td style="color:var(--text-med)">${d.empresa}</td>
+      <td>${tagComissao(d.comissao)}</td>
+      <td style="font-size:12px;color:var(--text-med)">${d.tempo}</td>
+      <td style="font-size:12px;color:var(--text-med)">${d.perfil}</td>
+      <td style="font-size:12px;color:var(--text-med)">${d.busca}</td>
+      <td><a class="btn-wpp" href="https://wa.me/55${d.whatsapp.replace(/\D/g,'')}" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.122 1.532 5.855L.057 23.885a.75.75 0 0 0 .93.927l6.107-1.557A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.804 9.804 0 0 1-4.988-1.366l-.358-.213-3.714.947.98-3.624-.233-.373A9.787 9.787 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+        WhatsApp
+      </a></td>
+    </tr>`).join('');
+}
+
+function filtrarTabela(filtro, el) {
+  filtroAtivo = filtro;
+  document.querySelectorAll('.filtro-tab').forEach(b => b.classList.remove('ativo'));
+  el.classList.add('ativo');
+  renderizarTabela(dadosGlobais, filtro);
+}
+</script>
+</body>
+</html>
